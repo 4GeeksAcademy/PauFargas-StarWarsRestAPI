@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, Users
+from models import db, Users, Planets, Characters
 
 
 app = Flask(__name__)
@@ -77,7 +77,7 @@ def handle_user(user_id):
         # opcion 1
         user = db.session.get(Users, user_id)
         if not user:
-            response_body['message'] = 'Usuario inexistente'
+            response_body['message'] = 'El usuario no existe'
             return response_body, 404
         """
         # opción 2
@@ -88,27 +88,65 @@ def handle_user(user_id):
         response_body['message'] = 'Usuario encontrado'
         response_body['results'] = results
         return response_body, 200
+
     if request.method == 'PUT':
+        response_body = {}
+        results = {}
         data = request.json
-        user = db.session.execute(db.select(Users).where(Users.id == user_id)).scalar()
+        user = db.session.execute(db.select(Users).where(Users.id == id_user)).scalar()
         if not user:
-            response_body['message'] = 'Usuario inexistente'
-            return response_body, 404        
+            response_body['message'] = 'El usuario no existe'
+            return response_body, 400
         user.email = data.get('email')
         db.session.commit()
         results['user'] = user.serialize()
-        response_body['message'] = 'Usuario actualizado'
+        response_body['message'] = 'Usuario modificado'
         response_body['results'] = results
         return response_body, 200
+
     if request.method == 'DELETE':
-        user = db.session.execute(db.select(Users).where(Users.id == user_id)).scalar()
+        response_body = {}
+        user = db.session.execute(db.select(Users).where(Users.id == id_user)).scalar()
         if not user:
-            response_body['message'] = 'Usuario inexistente'
-            return response_body, 404        
+            response_body['message'] = 'El usuario no existe'
+            return response_body, 400
         db.session.delete(user)
         db.session.commit()
-        response_body['message'] = 'Usuario eliminado'
+        response_body['message'] = 'Usuario ha sido eliminado'
         return response_body, 200
+
+#  HERE WE TAKE CARE OF PLANETS:
+
+@app.route('/planets', methods=['GET','POST'])
+def handle_planets():
+    if request.method == "GET":
+        response_body = {}
+        results = {}
+        planets = db.session.execute(db.select(Planets)).scalars()
+        results['planets'] = [row.serialize() for row in planets]
+        response_body['message'] = 'Lista de planetas'
+        response_body['results'] = results
+        return response_body, 200
+
+    if request.method == "POST":
+        response_body = {}
+        data = request.json
+        planet = Planets(name = data.get('name'),
+                        description = data.get('description'),
+                        diameter = data.get('diameter'),
+                        rotation_period = data.get('rotation_period'),  
+                        orbital_period = data.get('orbital_period'),
+                        gravity = data.get('gravity'),
+                        population = data.get('population'),
+                        climate = data.get('climate'),
+                        terrain = data.get('terrain'),
+                        surface_water = data.get('surface_water'))
+
+        db.session.add(planet)
+        db.session.commit()
+        response_body['planet'] = planet.serialize()
+        return response_body, 200  
+
 
 
 # This only runs if `$ python src/app.py` is executed

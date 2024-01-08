@@ -79,7 +79,22 @@ class Characters(db.Model):
     birth_year = db.Column(db.String)
     gender = db.Column(db.String)
     homeworld = db.Column(db.String)
-    url = db.Column(db.String)
+   
+
+    def serialize(self):
+        return {"id": self.id, 
+                "name": self.name,
+                "description": self.description,
+                "height": self.height,
+                "mass": self.mass,
+                "hair_color": self.hair_color,
+                "skin_color": self.skin_color,
+                "eye_color" : self.eye_color,
+                "birth_year" : self.birth_year,
+                "gender" : self.gender,
+                "homeworld" : self.homeworld,
+                }
+
 
 
 # Creamos una class que será el Modelo instanciando de Base. Naming convention: PascalCase en plural
@@ -96,7 +111,20 @@ class Planets(db.Model):
     climate = db.Column(db.Integer)
     terrain = db.Column(db.Integer)
     surface_water = db.Column(db.Integer)
-    url = db.Column(db.Integer)
+
+    def serialize(self):
+        return {"id": self.id, 
+                "name": self.name,
+                "description": self.description,
+                "diameter": self.diameter,
+                "rotation_period": self.rotation_period,
+                "orbital_period": self.orbital_period,
+                "gravity": self.gravity,
+                "population" : self.population,
+                "climate" : self.climate,
+                "terrain" : self.terrain,
+                "surface_water" : self.surface_water,
+                }
 
 # Creamos una class que será el Modelo instanciando de Base. Naming convention: PascalCase en plural
 class FavoriteCharacters(db.Model):
