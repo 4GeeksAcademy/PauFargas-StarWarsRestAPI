@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, Users, Planets, Characters
+from models import db, Users, Planets, Characters, FavoritePlanets, FavoriteCharacters
 
 
 app = Flask(__name__)
@@ -145,7 +145,112 @@ def handle_planets():
         db.session.add(planet)
         db.session.commit()
         response_body['planet'] = planet.serialize()
-        return response_body, 200  
+        return response_body, 200
+
+@app.route('/planets/<int:planet_id>', methods=['GET','DELETE'])
+def handle_planet():
+    if request.method == 'GET':
+        response_body = {}
+        results = {}
+        planet = db.session.get(Planets, planet_id)
+        if not planet:
+            response_body['Message: '] = 'No se ha encontrado'
+            return response_body, 200
+        
+        results['planet'] = planet.serialize()
+        response_body['Message: '] = 'Se ha encontrado el planeta'
+        response_body['Results: '] = results
+        return response_body,200
+    
+    if request.method == 'DELETE':
+        response_body = {}
+        planet = db.session.execute(db.select(Planets).where(Planets.id == planet_id)).scalar()
+        if not planet:
+            response_body['Message: '] = 'Planeta no encontrado'
+            return response_body,200
+        
+        db.session.delete(planet)
+        db.session.commit()
+        response_body['Message: '] = 'El planeta ha sido eliminado'
+        return response_body,200
+
+@app.route('/characters', methods=['GET', 'POST'])
+def handle_characters():
+    if request.method == 'GET':
+        response_body = {}
+        results = {}
+        characters = db.session.execute(db.select(Characters)).scalars()
+        results['Characters: '] = [row.serialize() for row in characters]
+    
+    if request.method == 'POST':
+        response_body = {}
+        data = request.json
+        character = Characters(name = data.get('name'),
+                        description = data.get('description'),
+                        height = data.get('height'),
+                        mass = data.get('mass'),  
+                        hair_color = data.get('hair_color'),
+                        skin_color = data.get('skin_color'),
+                        eye_color = data.get('eye_color'),
+                        birth_year = data.get('birth_year'),
+                        gender = data.get('gender'),
+                        homeworld = data.get('homeworld'))
+
+        db.session.add(character)
+        db.session.commit()
+        response_body['Message: '] = 'Personaje creado'
+        response_body['Results: '] = character.serialize()
+        return response_body,200
+
+@app.route('/characters/<int:character_id>', methods=['GET', 'DELETE'])
+def handle_character(character_id):
+    if request.method == 'GET':
+        response_body = {}
+        results = {}
+        character = db.session.get(Characters, character_id)
+        if not character:
+            response_body['Message: '] = 'Personaje no encontrado'
+            return response_body,200
+        results['Personaje: '] = character.serialize()
+        response_body['Message: '] = 'Se ha encontrado el personaje'
+        response_body['Results: '] = results
+        return response_body,200
+
+    if request.method == 'DELETE':
+        response_body = {}
+        character = db.session.execute(db.select(Characters).where(Characters.id == character_id)).scalar()
+        if not character:
+            response_body['Message :'] = 'Personaje no encontrado'
+            return response_body,200
+        db.session.delete(character)
+        db.session.commit()
+        response_body['Mensaje: '] = 'El personaje ha sido eliminado'
+        return response_body,200
+
+@app.route('/users/favorite_planets', methods=['GET'])
+def handle_favorite_planets():
+    if request.methods == GET:
+        response_body = {}
+        results = {}
+        favorite_planets = db.session.execute(db.select(FavoritePlanets)).scalars
+        results['Message:'] = 'Lista de favoritos'
+        response_body['Results: '] = results
+        return response_body,200 
+
+@app.route('/users/favorite_characters', methods=['GET'])
+def handle_favorite_characters():
+    if request.method == 'GET':
+        response_body = {}
+        results = {}
+        favorite_characters = db.session.execute(db.select(FavoriteCharacters)).scalars
+        results['Message: '] = 'Lista de favoritos'
+        response_body['Results: '] = results
+        return response_body,200
+
+
+    
+        
+
 
 
 
