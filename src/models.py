@@ -72,7 +72,7 @@ class Characters(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(250), nullable=False)
     height = db.Column(db.Integer)
-    mass = db.Column(db.String)
+    mass = db.Column(db.Integer)
     hair_color = db.Column(db.String)
     skin_color = db.Column(db.String)
     eye_color = db.Column(db.String)
@@ -108,8 +108,8 @@ class Planets(db.Model):
     orbital_period = db.Column(db.Integer)
     gravity = db.Column(db.Integer)
     population = db.Column(db.Integer)
-    climate = db.Column(db.Integer)
-    terrain = db.Column(db.Integer)
+    climate = db.Column(db.String)
+    terrain = db.Column(db.String)
     surface_water = db.Column(db.Integer)
 
     def serialize(self):
