@@ -187,8 +187,7 @@ def handle_characters():
         data = request.json
         character = Characters(name = data.get('name'),
                         description = data.get('description'),
-                        height = data.get('height'),
-                        mass = data.get('mass'),  
+                        height = data.get('height'), 
                         hair_color = data.get('hair_color'),
                         skin_color = data.get('skin_color'),
                         eye_color = data.get('eye_color'),

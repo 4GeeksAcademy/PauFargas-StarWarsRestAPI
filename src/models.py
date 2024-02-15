@@ -72,7 +72,6 @@ class Characters(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(250), nullable=False)
     height = db.Column(db.Integer)
-    mass = db.Column(db.Integer)
     hair_color = db.Column(db.String)
     skin_color = db.Column(db.String)
     eye_color = db.Column(db.String)
